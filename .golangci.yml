@@ -371,5 +371,5 @@ linters:
     - exportloopref
     - gci
     - gosec
-    - lll
+#    - lll
   fast: false

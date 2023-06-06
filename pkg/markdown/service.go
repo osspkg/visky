@@ -9,6 +9,8 @@ import (
 
 	d2 "github.com/FurqanSoftware/goldmark-d2"
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
+	"github.com/deweppro/go-sdk/errors"
+	"github.com/deweppro/go-sdk/log"
 	figure "github.com/mangoumbrella/goldmark-figure"
 	"github.com/osspkg/visky/pkg/pool"
 	fences "github.com/stefanfritsch/goldmark-fences"
@@ -139,12 +141,18 @@ func (v *Markdown) RenderContent(source []byte) ([]byte, Meta, error) {
 		return nil, Meta{}, fmt.Errorf("render markdown: %w", err)
 	}
 
-	ast.Walk(doc, func(node ast.Node, enter bool) (ast.WalkStatus, error) {
+	err := ast.Walk(doc, func(node ast.Node, enter bool) (ast.WalkStatus, error) {
 		if n, ok := node.(*hashtag.Node); ok && enter {
 			metaData.Tags = append(metaData.Tags, string(n.Tag))
 		}
 		return ast.WalkContinue, nil
 	})
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err.Error(),
+		}).Errorf("Markdown meta ast")
+
+	}
 
 	return b.Bytes(), metaData, nil
 }
@@ -154,11 +162,18 @@ func (v *Markdown) RenderContent(source []byte) ([]byte, Meta, error) {
 type hashTag struct{}
 
 func (v *hashTag) ResolveHashtag(node *hashtag.Node) ([]byte, error) {
+	var err error
 	b := pool.ResolveBytes(func(w pool.Writer) {
-		w.WriteString("/tags/")
-		w.Write(node.Tag)
-		w.WriteString("/")
+		_, err = w.WriteString("/tags/")
+		err = errors.Wrap(err)
+		_, err = w.Write(node.Tag)
+		err = errors.Wrap(err)
+		_, err = w.WriteString("/")
+		err = errors.Wrap(err)
 	})
+	if err != nil {
+		return nil, fmt.Errorf("resolve tashtag : %w", err)
+	}
 	return b, nil
 }
 

@@ -9,6 +9,7 @@ require (
 	github.com/deweppro/goppy v0.12.3
 	github.com/mangoumbrella/goldmark-figure v1.0.0
 	github.com/stefanfritsch/goldmark-fences v1.0.0
+	github.com/stretchr/testify v1.8.2
 	github.com/yuin/goldmark v1.5.4
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20220924101305-151362477c87
 	github.com/yuin/goldmark-meta v1.1.0
@@ -16,6 +17,7 @@ require (
 	go.abhg.dev/goldmark/hashtag v0.3.1
 	go.abhg.dev/goldmark/mermaid v0.4.0
 	go.abhg.dev/goldmark/toc v0.4.0
+	golang.org/x/image v0.7.0
 	mvdan.cc/xurls/v2 v2.5.0
 	oss.terrastruct.com/d2 v0.1.6
 )
@@ -27,6 +29,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.8.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deweppro/go-algorithms v1.2.1 // indirect
 	github.com/deweppro/go-static v1.3.0 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
@@ -43,11 +46,11 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mazznoer/csscolorparser v0.1.3 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771 // indirect
-	golang.org/x/image v0.3.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/term v0.8.0 // indirect
