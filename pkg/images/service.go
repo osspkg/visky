@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/deweppro/go-sdk/errors"
 	"github.com/deweppro/go-sdk/log"
@@ -26,6 +27,8 @@ var (
 type (
 	Images struct {
 		folder string
+		cache  map[string]ImageInfo
+		mux    sync.Mutex
 	}
 
 	ImageInfo struct {
@@ -46,7 +49,10 @@ var decoders = map[string]func(r io.Reader) (image.Image, error){
 }
 
 func New() *Images {
-	return &Images{}
+	return &Images{
+		folder: "",
+		cache:  make(map[string]ImageInfo, 100),
+	}
 }
 
 func (v *Images) SetFolder(dir string) error {
@@ -64,6 +70,14 @@ func (v *Images) Build(filename string, scale, thumb int) (*ImageInfo, error) {
 	if img.Hash, err = v.getHash(filename); err != nil {
 		return nil, err
 	}
+
+	v.mux.Lock()
+	i, ok := v.cache[img.Hash]
+	v.mux.Unlock()
+	if ok {
+		return &i, nil
+	}
+
 	if img.Origin, err = v.resize(filename, img.Hash+".orig", 0); err != nil {
 		return nil, err
 	}
@@ -73,6 +87,11 @@ func (v *Images) Build(filename string, scale, thumb int) (*ImageInfo, error) {
 	if img.Thumb, err = v.resize(filename, img.Hash+".thumb", thumb); err != nil {
 		return nil, err
 	}
+
+	v.mux.Lock()
+	v.cache[img.Hash] = *img
+	v.mux.Unlock()
+
 	return img, nil
 }
 

@@ -9,9 +9,9 @@ import (
 
 	d2 "github.com/FurqanSoftware/goldmark-d2"
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
-	"github.com/deweppro/go-sdk/errors"
 	"github.com/deweppro/go-sdk/log"
 	figure "github.com/mangoumbrella/goldmark-figure"
+	"github.com/osspkg/visky/pkg/markdown/hook"
 	"github.com/osspkg/visky/pkg/pool"
 	fences "github.com/stefanfritsch/goldmark-fences"
 	"github.com/yuin/goldmark"
@@ -47,8 +47,9 @@ func New(c ConfigValue) *Markdown {
 		serv: goldmark.New(
 			goldmark.WithExtensions(
 				func(c ConfigValue) []goldmark.Extender {
-					ext := make([]goldmark.Extender, 0, 20)
+					ext := make([]goldmark.Extender, 0, 100)
 					ext = append(ext,
+						hook.New(c.Unsafe),
 						extension.Footnote,
 						extension.DefinitionList,
 						extension.Strikethrough,
@@ -107,7 +108,6 @@ func New(c ConfigValue) *Markdown {
 					options := make([]renderer.Option, 0, 5)
 					options = append(options,
 						html.WithHardWraps(),
-						html.WithXHTML(),
 					)
 					if c.Unsafe {
 						options = append(options, html.WithUnsafe())
@@ -162,18 +162,11 @@ func (v *Markdown) RenderContent(source []byte) ([]byte, Meta, error) {
 type hashTag struct{}
 
 func (v *hashTag) ResolveHashtag(node *hashtag.Node) ([]byte, error) {
-	var err error
 	b := pool.ResolveBytes(func(w pool.Writer) {
-		_, err = w.WriteString("/tags/")
-		err = errors.Wrap(err)
-		_, err = w.Write(node.Tag)
-		err = errors.Wrap(err)
-		_, err = w.WriteString("/")
-		err = errors.Wrap(err)
+		w.WriteString("/tags/") //nolint:errcheck
+		w.Write(node.Tag)       //nolint:errcheck
+		w.WriteString("/")      //nolint:errcheck
 	})
-	if err != nil {
-		return nil, fmt.Errorf("resolve tashtag : %w", err)
-	}
 	return b, nil
 }
 

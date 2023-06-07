@@ -60,6 +60,34 @@ Hello #world
 			},
 			wantErr: false,
 		},
+		{
+			name: "Case 2",
+			fields: fields{
+				conf: markdown.ConfigValue{
+					CJK:    false,
+					Unsafe: false,
+				},
+			},
+			args: args{
+				source: `---
+title: title
+summary: summary
+---
+
+![aaa](bbb.jpg "ccc"){width=100}
+
+![ddd](/eee/eee.jpg){sizes=x0x,width=100}
+`,
+			},
+			want: []byte(`<p><figure><img src="bbb.jpg" alt="aaa" width="100""><figcaption>ccc</figcaption></figure></p>
+<p><figure><img src="/eee/eee.jpg" alt="ddd" sizes="x0x" width="100""></figure></p>
+`),
+			want1: markdown.Meta{
+				Title:       "title",
+				Description: "",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
